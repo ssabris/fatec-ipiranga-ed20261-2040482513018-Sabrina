@@ -1,0 +1,9 @@
+2. Quais as vantagens de se programar com TADs?
+
+Segurança dos Dados: Como o usuário não acessa a struct diretamente, evitamos que ele altere um valor por engano (ex: mudar o saldo de uma conta bancária sem passar pela função de depósito).
+
+Modularidade: O código fica dividido em blocos lógicos menores e independentes, facilitando a leitura e o desenvolvimento em equipe.
+
+Reaproveitamento de Código: Um TAD bem construído pode ser facilmente copiado e utilizado em outros projetos no futuro.
+
+Facilidade de Manutenção: Se você precisar mudar a forma como a conta bancária funciona internamente (ex: mudar de float para double), você altera apenas o arquivo do TAD. O restante do programa que usa o TAD continuará funcionando perfeitamente sem precisar de adaptações.
