@@ -1,19 +1,20 @@
-/*
- * Atividade N2-1: Explorando Árvore Binária
- * Fatec Ipiranga - Estrutura de Dados
- * Prof. Veríssimo
- */
+/*----------------------------------------------------------------------------------*/
+/*FATEC-Ipiranga                                                                    */
+/*ADS - Estrutura de Dados                                                          */
+/*Prof - Veríssimo                                                                  */
+/*                                                                                  */
+/*Id da Atividade: N2-1                                                             */
+/*Objetivo: Explorando Árvore Binária (BST)                                         */
+/*                                                                                  */
+/*Autora: Sabrina Bernardi                                                          */
+/*Data: 28/04/2026                                                                  */
+/*----------------------------------------------------------------------------------*/
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "minhalib.h"
 
-/* ===================== ESTRUTURA ===================== */
-
-typedef struct No {
-    int valor;
-    struct No *esq;
-    struct No *dir;
-} No;
+/* ======================= FUNÇÕES =======================*/
 
 /* ===================== CRIAÇÃO NÓ ===================== */
 
