@@ -7,7 +7,7 @@
 /*Objetivo: Explorando Árvore Binária (BST)                                         */
 /*                                                                                  */
 /*Autora: Sabrina Bernardi                                                          */
-/*Data: 28/04/2026                                                                  */
+/*Data: 05/05/2026                                                                  */
 /*----------------------------------------------------------------------------------*/
 
 #include <stdio.h>
