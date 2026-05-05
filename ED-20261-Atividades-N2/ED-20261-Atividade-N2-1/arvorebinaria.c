@@ -36,93 +36,7 @@ No* inserir(No *raiz, int valor) {
     return raiz;
 }
 
-/* ===================== RAIZ ===================== */
-
-void imprimir_raiz(No *raiz) {
-    printf("========================================\n");
-    printf("RAIZ:\n");
-    if (raiz != NULL)
-        printf("  %d\n", raiz->valor);
-    else
-        printf("  (arvore vazia)\n");
-    printf("\n");
-}
-
-/* ===================== NÓS INTERNOS E FOLHAS ===================== */
-
-void imprimir_nos_internos(No *no) {
-    if (no == NULL) return;
-    /* Nó interno: tem ao menos um filho */
-    if (no->esq != NULL || no->dir != NULL)
-        printf("  %d\n", no->valor);
-    imprimir_nos_internos(no->esq);
-    imprimir_nos_internos(no->dir);
-}
-
-void imprimir_folhas(No *no) {
-    if (no == NULL) return;
-    /* Folha: não tem filhos */
-    if (no->esq == NULL && no->dir == NULL)
-        printf("  %d\n", no->valor);
-    imprimir_folhas(no->esq);
-    imprimir_folhas(no->dir);
-}
-
-/* ===================== NÍVEIS ===================== */
-
-/* Imprime todos os nós que estão no nível alvo */
-void imprimir_nivel(No *no, int nivel_atual, int nivel_alvo) {
-    if (no == NULL) return;
-    if (nivel_atual == nivel_alvo) {
-        printf("  %d\n", no->valor);
-        return;
-    }
-    imprimir_nivel(no->esq, nivel_atual + 1, nivel_alvo);
-    imprimir_nivel(no->dir, nivel_atual + 1, nivel_alvo);
-}
-
-/* Retorna a altura da árvore (número de níveis) */
-int altura_arvore(No *no) {
-    if (no == NULL) return 0;
-    int h_esq = altura_arvore(no->esq);
-    int h_dir = altura_arvore(no->dir);
-    return 1 + (h_esq > h_dir ? h_esq : h_dir);
-}
-
-void imprimir_todos_niveis(No *raiz) {
-    printf("========================================\n");
-    printf("NIVEIS:\n");
-    int total = altura_arvore(raiz);
-    for (int i = 1; i <= 7; i++) {
-        printf("  Nivel %d:", i);
-        if (i > total) {
-            printf(" (vazio)\n");
-        } else {
-            printf("\n");
-            imprimir_nivel(raiz, 1, i);
-        }
-    }
-    printf("\n");
-}
-
-/* ===================== GRAU ===================== */
-
-int grau_no(No *no) {
-    if (no == NULL) return -1;
-    int g = 0;
-    if (no->esq != NULL) g++;
-    if (no->dir != NULL) g++;
-    return g;
-}
-
-void imprimir_grau_todos(No *no) {
-    if (no == NULL) return;
-    printf("  %d -> grau %d\n", no->valor, grau_no(no));
-    imprimir_grau_todos(no->esq);
-    imprimir_grau_todos(no->dir);
-}
-
-/* ===================== BUSCA DE NÓ ===================== */
+/* ===================== BUSCA DE NÓ (Auxiliar) ================= */
 
 No* buscar(No *raiz, int valor) {
     if (raiz == NULL) return NULL;
@@ -132,82 +46,123 @@ No* buscar(No *raiz, int valor) {
     return buscar(raiz->dir, valor);
 }
 
-/* ===================== ANCESTRAIS ===================== */
+/* ===================== FUNÇÕES OBRIGATÓRIAS ==================== */
 
-/* Retorna 1 se encontrou o valor na subárvore e imprime o caminho (ancestrais) */
-int imprimir_ancestrais(No *no, int valor) {
+void imprimir_nos_internos(No* raiz) {
+    if (raiz == NULL) return;
+    /* Nó interno: tem ao menos um filho */
+    if (raiz->esq != NULL || raiz->dir != NULL)
+        printf("  %d\n", raiz->valor);
+    imprimir_nos_internos(raiz->esq);
+    imprimir_nos_internos(raiz->dir);
+}
+
+void imprimir_folhas(No* raiz) {
+    if (raiz == NULL) return;
+    /* Folha: não tem filhos */
+    if (raiz->esq == NULL && raiz->dir == NULL)
+        printf("  %d\n", raiz->valor);
+    imprimir_folhas(raiz->esq);
+    imprimir_folhas(raiz->dir);
+}
+
+void imprimir_niveis(No* raiz, int nivel_atual) {
+    if (raiz == NULL) return;
+    printf("  %d (Nivel %d)\n", raiz->valor, nivel_atual);
+    imprimir_niveis(raiz->esq, nivel_atual + 1);
+    imprimir_niveis(raiz->dir, nivel_atual + 1);
+}
+
+int calcular_altura(No* no) {
+    if (no == NULL) return -1;
+    int h_esq = calcular_altura(no->esq);
+    int h_dir = calcular_altura(no->dir);
+    return 1 + (h_esq > h_dir ? h_esq : h_dir);
+}
+
+int calcular_profundidade(No* raiz, int valor, int profundidade_atual) {
+    if (raiz == NULL) return -1;
+    if (raiz->valor == valor) return profundidade_atual;
+    
+    int esq = calcular_profundidade(raiz->esq, valor, profundidade_atual + 1);
+    if (esq != -1) return esq;
+    
+    return calcular_profundidade(raiz->dir, valor, profundidade_atual + 1);
+}
+
+/* --- Auxiliar para Ancestrais --- */
+int _imprimir_ancestrais_aux(No* no, int valor) {
     if (no == NULL) return 0;
     if (no->valor == valor) return 1;
-    if (imprimir_ancestrais(no->esq, valor) ||
-        imprimir_ancestrais(no->dir, valor)) {
+    if (_imprimir_ancestrais_aux(no->esq, valor) ||
+        _imprimir_ancestrais_aux(no->dir, valor)) {
         printf("  %d\n", no->valor);
         return 1;
     }
     return 0;
 }
 
-/* ===================== DESCENDENTES ===================== */
+void imprimir_ancestrais(No* raiz, int valor) {
+    int encontrou = _imprimir_ancestrais_aux(raiz, valor);
+    if (!encontrou) {
+        printf("  (Nenhum ancestral ou valor nao encontrado)\n");
+    }
+}
 
-void imprimir_descendentes(No *no, int primeiro) {
+/* --- Auxiliar para Descendentes --- */
+void _imprimir_tudo(No* no) {
     if (no == NULL) return;
-    if (!primeiro)  //não imprime o próprio nó, só seus filhos em diante 
-        printf("  %d\n", no->valor);
-    imprimir_descendentes(no->esq, 0);
-    imprimir_descendentes(no->dir, 0);
+    printf("  %d\n", no->valor);
+    _imprimir_tudo(no->esq);
+    _imprimir_tudo(no->dir);
 }
 
-/* ===================== ALTURA DO NÓ ===================== */
-
-int altura_no(No *no) {
-    if (no == NULL) return -1;
-    int h_esq = altura_no(no->esq);
-    int h_dir = altura_no(no->dir);
-    return 1 + (h_esq > h_dir ? h_esq : h_dir);
-}
-
-/* ===================== PROFUNDIDADE DO NÓ ===================== */
-
-int profundidade_no(No *raiz, int valor, int prof_atual) {
-    if (raiz == NULL) return -1;
-    if (raiz->valor == valor) return prof_atual;
-    int esq = profundidade_no(raiz->esq, valor, prof_atual + 1);
-    if (esq != -1) return esq;
-    return profundidade_no(raiz->dir, valor, prof_atual + 1);
-}
-
-/* ===================== SUB-ÁRVORE ===================== */
-
-void imprimir_subarvore(No *no, int prefixo[], int nivel, int eh_direito) {
+void imprimir_descendentes(No* no) {
     if (no == NULL) return;
+    /* Imprime apenas as subárvores, ignorando o próprio nó alvo */
+    _imprimir_tudo(no->esq);
+    _imprimir_tudo(no->dir);
+}
 
-    //Imprime a linha de prefixo
-    for (int i = 0; i < nivel - 1; i++) {
-        if (prefixo[i])
-            printf("│   ");
-        else
-            printf("    ");
+/* ===================== FUNÇÃO PRINCIPAL DE DIAGNÓSTICO ===================== */
+
+void analisar_arvore(No* raiz, int valorBusca) {
+    printf("\n================ DIAGNOSTICO DA ARVORE ================\n");
+    
+    printf("--- Nos Internos ---\n");
+    imprimir_nos_internos(raiz);
+    
+    printf("\n--- Folhas ---\n");
+    imprimir_folhas(raiz);
+    
+    printf("\n--- Todos os Niveis ---\n");
+    imprimir_niveis(raiz, 0);
+    
+    printf("\n--- Metricas Gerais ---\n");
+    printf("  Altura da Arvore: %d\n", calcular_altura(raiz));
+    
+    printf("\n--- Analise do Valor: %d ---\n", valorBusca);
+    int prof = calcular_profundidade(raiz, valorBusca, 0);
+    if (prof != -1) {
+        printf("  Profundidade: %d\n", prof);
+    } else {
+        printf("  Profundidade: Valor nao encontrado.\n");
     }
-
-    if (nivel > 0) {
-        if (eh_direito)
-            printf("└── ");
-        else
-            printf("├── ");
+    
+    printf("  Ancestrais:\n");
+    imprimir_ancestrais(raiz, valorBusca);
+    
+    No* noBusca = buscar(raiz, valorBusca);
+    printf("  Descendentes:\n");
+    if (noBusca) {
+        if (noBusca->esq == NULL && noBusca->dir == NULL) {
+            printf("  (Nao possui descendentes)\n");
+        } else {
+            imprimir_descendentes(noBusca);
+        }
+    } else {
+        printf("  (Valor nao encontrado para verificar descendentes)\n");
     }
-
-    printf("%d\n", no->valor);
-
-    // Se tem dois filhos, o esquerdo tem irmão (├──), o direito não (└──) 
-    //Se tem um filho só, ele é o último (└──)
-    int tem_dois = (no->esq != NULL && no->dir != NULL);
-
-    if (no->esq != NULL) {
-        //prefixo[nivel]=1 quando haverá irmão direito depois (para manter │)
-        prefixo[nivel] = tem_dois ? 1 : 0;
-        imprimir_subarvore(no->esq, prefixo, nivel + 1, tem_dois ? 0 : 1);
-    }
-    if (no->dir != NULL) {
-        prefixo[nivel] = 0;
-        imprimir_subarvore(no->dir, prefixo, nivel + 1, 1);
-    }
+    
+    printf("=======================================================\n");
 }
