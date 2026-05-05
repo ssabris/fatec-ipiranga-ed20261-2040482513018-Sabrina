@@ -12,7 +12,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "minhalib.h"
+#include "minhabib.h"
 
 /* ======================= FUNÇÕES =======================*/
 
@@ -36,7 +36,7 @@ No* inserir(No *raiz, int valor) {
     return raiz;
 }
 
-/* ===================== BUSCA DE NÓ (Auxiliar) ================= */
+/* ===================== BUSCA DE NÓ ==================== */
 
 No* buscar(No *raiz, int valor) {
     if (raiz == NULL) return NULL;
@@ -90,38 +90,33 @@ int calcular_profundidade(No* raiz, int valor, int profundidade_atual) {
     return calcular_profundidade(raiz->dir, valor, profundidade_atual + 1);
 }
 
-/* --- Auxiliar para Ancestrais --- */
-int _imprimir_ancestrais_aux(No* no, int valor) {
-    if (no == NULL) return 0;
-    if (no->valor == valor) return 1;
-    if (_imprimir_ancestrais_aux(no->esq, valor) ||
-        _imprimir_ancestrais_aux(no->dir, valor)) {
-        printf("  %d\n", no->valor);
-        return 1;
-    }
-    return 0;
-}
-
 void imprimir_ancestrais(No* raiz, int valor) {
-    int encontrou = _imprimir_ancestrais_aux(raiz, valor);
-    if (!encontrou) {
-        printf("  (Nenhum ancestral ou valor nao encontrado)\n");
+    /* Se chegou no fim ou encontrou o valor, a recursão para */
+    if (raiz == NULL || raiz->valor == valor) return;
+    
+    /* Aproveita a propriedade da BST para guiar a impressão de baixo pra cima */
+    if (valor < raiz->valor && buscar(raiz->esq, valor) != NULL) {
+        imprimir_ancestrais(raiz->esq, valor);
+        printf("  %d\n", raiz->valor);
+    } else if (valor > raiz->valor && buscar(raiz->dir, valor) != NULL) {
+        imprimir_ancestrais(raiz->dir, valor);
+        printf("  %d\n", raiz->valor);
     }
-}
-
-/* --- Auxiliar para Descendentes --- */
-void _imprimir_tudo(No* no) {
-    if (no == NULL) return;
-    printf("  %d\n", no->valor);
-    _imprimir_tudo(no->esq);
-    _imprimir_tudo(no->dir);
 }
 
 void imprimir_descendentes(No* no) {
     if (no == NULL) return;
-    /* Imprime apenas as subárvores, ignorando o próprio nó alvo */
-    _imprimir_tudo(no->esq);
-    _imprimir_tudo(no->dir);
+    
+    /* Imprime o filho (se existir) e passa a recursão, 
+       garantindo que não vai imprimir o nó raiz inicial */
+    if (no->esq != NULL) {
+        printf("  %d\n", no->esq->valor);
+        imprimir_descendentes(no->esq);
+    }
+    if (no->dir != NULL) {
+        printf("  %d\n", no->dir->valor);
+        imprimir_descendentes(no->dir);
+    }
 }
 
 /* ===================== FUNÇÃO PRINCIPAL DE DIAGNÓSTICO ===================== */
@@ -150,7 +145,11 @@ void analisar_arvore(No* raiz, int valorBusca) {
     }
     
     printf("  Ancestrais:\n");
-    imprimir_ancestrais(raiz, valorBusca);
+    if (buscar(raiz, valorBusca) != NULL && raiz != NULL && raiz->valor != valorBusca) {
+        imprimir_ancestrais(raiz, valorBusca);
+    } else {
+        printf("  (Nenhum ancestral ou valor nao encontrado)\n");
+    }
     
     No* noBusca = buscar(raiz, valorBusca);
     printf("  Descendentes:\n");
