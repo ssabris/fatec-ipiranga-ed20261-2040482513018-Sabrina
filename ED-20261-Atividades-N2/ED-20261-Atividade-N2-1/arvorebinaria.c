@@ -14,27 +14,7 @@
 #include <stdlib.h>
 #include "minhabib.h"
 
-/* ======================= FUNÇÕES =======================*/
-
-/* ===================== CRIAÇÃO NÓ ===================== */
-
-No* criar_no(int valor) {
-    No *novo = (No*) malloc(sizeof(No));
-    novo->valor = valor;
-    novo->esq = NULL;
-    novo->dir = NULL;
-    return novo;
-}
-
-No* inserir(No *raiz, int valor) {
-    if (raiz == NULL)
-        return criar_no(valor);
-    if (valor < raiz->valor)
-        raiz->esq = inserir(raiz->esq, valor);
-    else if (valor > raiz->valor)
-        raiz->dir = inserir(raiz->dir, valor);
-    return raiz;
-}
+/* ======================= FUNÇÕES OBRIGATÓRIAS =======================*/
 
 /* ===================== BUSCA DE NÓ ==================== */
 
@@ -83,17 +63,17 @@ int calcular_altura(No* no) {
 int calcular_profundidade(No* raiz, int valor, int profundidade_atual) {
     if (raiz == NULL) return -1;
     if (raiz->valor == valor) return profundidade_atual;
-    
+
     int esq = calcular_profundidade(raiz->esq, valor, profundidade_atual + 1);
     if (esq != -1) return esq;
-    
+
     return calcular_profundidade(raiz->dir, valor, profundidade_atual + 1);
 }
 
 void imprimir_ancestrais(No* raiz, int valor) {
     /* Se chegou no fim ou encontrou o valor, a recursão para */
     if (raiz == NULL || raiz->valor == valor) return;
-    
+
     /* Aproveita a propriedade da BST para guiar a impressão de baixo pra cima */
     if (valor < raiz->valor && buscar(raiz->esq, valor) != NULL) {
         imprimir_ancestrais(raiz->esq, valor);
@@ -106,8 +86,8 @@ void imprimir_ancestrais(No* raiz, int valor) {
 
 void imprimir_descendentes(No* no) {
     if (no == NULL) return;
-    
-    /* Imprime o filho (se existir) e passa a recursão, 
+
+    /* Imprime o filho (se existir) e passa a recursão,
        garantindo que não vai imprimir o nó raiz inicial */
     if (no->esq != NULL) {
         printf("  %d\n", no->esq->valor);
@@ -123,19 +103,19 @@ void imprimir_descendentes(No* no) {
 
 void analisar_arvore(No* raiz, int valorBusca) {
     printf("\n================ DIAGNOSTICO DA ARVORE ================\n");
-    
+
     printf("--- Nos Internos ---\n");
     imprimir_nos_internos(raiz);
-    
+
     printf("\n--- Folhas ---\n");
     imprimir_folhas(raiz);
-    
+
     printf("\n--- Todos os Niveis ---\n");
     imprimir_niveis(raiz, 0);
-    
+
     printf("\n--- Metricas Gerais ---\n");
     printf("  Altura da Arvore: %d\n", calcular_altura(raiz));
-    
+
     printf("\n--- Analise do Valor: %d ---\n", valorBusca);
     int prof = calcular_profundidade(raiz, valorBusca, 0);
     if (prof != -1) {
@@ -143,14 +123,14 @@ void analisar_arvore(No* raiz, int valorBusca) {
     } else {
         printf("  Profundidade: Valor nao encontrado.\n");
     }
-    
+
     printf("  Ancestrais:\n");
     if (buscar(raiz, valorBusca) != NULL && raiz != NULL && raiz->valor != valorBusca) {
         imprimir_ancestrais(raiz, valorBusca);
     } else {
         printf("  (Nenhum ancestral ou valor nao encontrado)\n");
     }
-    
+
     No* noBusca = buscar(raiz, valorBusca);
     printf("  Descendentes:\n");
     if (noBusca) {
@@ -162,6 +142,6 @@ void analisar_arvore(No* raiz, int valorBusca) {
     } else {
         printf("  (Valor nao encontrado para verificar descendentes)\n");
     }
-    
+
     printf("=======================================================\n");
 }
